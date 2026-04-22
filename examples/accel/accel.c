@@ -299,8 +299,8 @@ static void sensor_event_cb(inv_imu_sensor_event_t *event)
 	if (print_si) {
 		float    accel_g[3];
 		float    temp_degc;
-		uint16_t accel_fsr_g = imu_dev.fifo_highres_enabled ? 16 : 4;
-		int      max_lsb     = imu_dev.fifo_highres_enabled ? 524287 : 32768;
+		uint16_t accel_fsr_g = fifo_en && hires_en ? 16 : 4;
+		int      max_lsb     = fifo_en && hires_en ? 524287 : 32768;
 
 		/* Convert raw data into scaled data in g and dps */
 		accel_g[0] = (float)(accel_raw[0] * accel_fsr_g) / (float)max_lsb;
@@ -361,6 +361,7 @@ static int get_uart_command()
 		fifo_en = !fifo_en;
 		INV_MSG(INV_MSG_LEVEL_INFO, "%s FIFO.", fifo_en ? "Enabling" : "Disabling");
 		rc |= configure_fifo();
+		rc |= configure_hires();
 		break;
 	case 'i':
 		hires_en = !hires_en;
